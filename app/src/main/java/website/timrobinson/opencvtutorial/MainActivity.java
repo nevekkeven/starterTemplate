@@ -8,6 +8,8 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -22,15 +24,19 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-public class MainActivity extends AppCompatActivity implements OnTouchListener, CvCameraViewListener2 {
+public class MainActivity extends AppCompatActivity implements OnTouchListener, CvCameraViewListener2, View.OnClickListener {
 
     private CameraBridgeViewBase mOpenCvCameraView;
     private Mat mRgba;
     private Scalar mBlobColorHsv;
     private Scalar mBlobColorRgba;
 
+    //declare widget ui:
     TextView touch_coordinates;
     TextView touch_color;
+    ImageView imgUpload;
+    Button btnimgUpload;
+
 
     double x = -1;
     double y = -1;
@@ -59,9 +65,12 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        //declare ui widgets:
         touch_coordinates = (TextView) findViewById(R.id.touch_coordinates);
         touch_color = (TextView) findViewById(R.id.touch_color);
-
+        imgUpload= (ImageView) findViewById(R.id.imgUpload);
+        btnimgUpload=(Button) findViewById(R.id.btnimgUpload);
+        imgUpload.setOnClickListener(this);
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.opencv_tutorial_activity_surface_view);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
@@ -133,16 +142,20 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         touch_coordinates.setText("X: " + Double.valueOf(x) + ", Y: " + Double.valueOf(y));
 
         Rect touchedRect = new Rect();
-
+        //casting
         touchedRect.x = (int)x;
         touchedRect.y = (int)y;
 
-        touchedRect.width = 8;
-        touchedRect.height = 8;
+        touchedRect.width = 15;
+        touchedRect.height = 15;
 
+        // extrait la region touchee par l utilisateur
         Mat touchedRegionRgba = mRgba.submat(touchedRect);
 
         Mat touchedRegionHsv = new Mat();
+
+        //Imgproc.blur(frame, touchedRegionRgba, new Size(7, 7));
+
         Imgproc.cvtColor(touchedRegionRgba, touchedRegionHsv, Imgproc.COLOR_RGB2HSV_FULL);
 
         mBlobColorHsv = Core.sumElems(touchedRegionHsv);
@@ -172,5 +185,10 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         Imgproc.cvtColor(pointMatHsv, pointMatRgba, Imgproc.COLOR_HSV2RGB_FULL, 4);
 
         return new Scalar(pointMatRgba.get(0, 0));
+    }
+
+    @Override
+    public void onClick(View view) {
+        
     }
 }
