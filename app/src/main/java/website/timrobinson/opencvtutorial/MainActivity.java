@@ -1,15 +1,17 @@
 package website.timrobinson.opencvtutorial;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -20,27 +22,29 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-public class MainActivity extends AppCompatActivity implements OnTouchListener, CvCameraViewListener2, View.OnClickListener {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
+public class MainActivity extends AppCompatActivity implements OnTouchListener, CvCameraViewListener2 {
+    private static final String TAG = "MyActivity";
     private CameraBridgeViewBase mOpenCvCameraView;
     private Mat mRgba;
     private Scalar mBlobColorHsv;
     private Scalar mBlobColorRgba;
 
-    //declare widget ui:
     TextView touch_coordinates;
     TextView touch_color;
-    ImageView imgUpload;
-    Button btnimgUpload;
-
 
     double x = -1;
     double y = -1;
 
+    /* ******************opencv instanciation*************************************************** */
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
@@ -57,32 +61,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
             }
         }
     };
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        //declare ui widgets:
-        touch_coordinates = (TextView) findViewById(R.id.touch_coordinates);
-        touch_color = (TextView) findViewById(R.id.touch_color);
-        imgUpload= (ImageView) findViewById(R.id.imgUpload);
-        btnimgUpload=(Button) findViewById(R.id.btnimgUpload);
-        imgUpload.setOnClickListener(this);
-        mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.opencv_tutorial_activity_surface_view);
-        mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
-        mOpenCvCameraView.setCvCameraViewListener(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
-    }
-
+    /* check if opencv is installed */
     @Override
     public void onResume() {
         super.onResume();
@@ -91,15 +70,24 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         } else {
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
-    }
+    };
+    /* **************end opencv instanciation************************************************* */
+
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
-    }
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        touch_coordinates = (TextView) findViewById(R.id.touch_coordinates);
+        touch_color = (TextView) findViewById(R.id.touch_color);
+
+        mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.opencv_tutorial_activity_surface_view);
+        mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
+        mOpenCvCameraView.setCvCameraViewListener(this);
+    }
     @Override
     public void onCameraViewStarted(int width, int height) {
         mRgba = new Mat();
@@ -113,11 +101,50 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        if (mOpenCvCameraView != null)
+            mOpenCvCameraView.disableView();
+    }
+
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mOpenCvCameraView != null)
+            mOpenCvCameraView.disableView();
+    }
+
+
+
+    @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         mRgba = inputFrame.rgba();
         return mRgba;
     }
-
+    /* algo de detection de contour en utilisant la transformation de Hough */
+    /* prend un parametre une image et retourne une image */
+  public Mat Contours (Mat mymat) {
+      Mat grayMat = new Mat();
+      Mat cannyEdges = new Mat();
+      Mat hierarchy = new Mat();
+      Mat contours = new Mat();
+      Random r =new Random();
+      //a list to store all the contours:
+      List<MatOfPoint> contourList = new ArrayList<MatOfPoint>();
+      //converting the image to grayscale:
+      Imgproc.cvtColor(mymat,grayMat,Imgproc.COLOR_BGR2GRAY);
+      Imgproc.Canny(grayMat,cannyEdges,10,100);
+      //finding contours:
+      Imgproc.findContours(cannyEdges,contourList,hierarchy,Imgproc.RETR_LIST,Imgproc.CHAIN_APPROX_SIMPLE);
+      //drawing contours:
+      contours.create(cannyEdges.rows(),cannyEdges.cols(),CvType.CV_8UC3);
+      for (int i=0; i <contourList.size();i++) {
+          Imgproc.drawContours(contours,contourList,i, new Scalar(r.nextInt(255),r.nextInt(255),r.nextInt(255)),-1 );
+      }
+      return contours;
+  }
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         int cols = mRgba.cols();
@@ -129,34 +156,31 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         double xScale = (double)cols / (double)mOpenCvCameraView.getWidth();
         double yScale = (double)rows / (yHigh - yLow);
 
+        /* coordonnees de la region de touche */
         x = event.getX();
         y = event.getY();
-
         y = y - yLow;
-
         x = x * xScale;
         y = y * yScale;
+        /* fin coordonnees de la region de touche */
 
         if((x < 0) || (y < 0) || (x > cols) || (y > rows)) return false;
-
+        //affihe les coordonnes de click a l'ecran:
         touch_coordinates.setText("X: " + Double.valueOf(x) + ", Y: " + Double.valueOf(y));
 
+        //defini une region rectangulaire pour detecter la couleur
         Rect touchedRect = new Rect();
-        //casting
         touchedRect.x = (int)x;
         touchedRect.y = (int)y;
-
-        touchedRect.width = 15;
-        touchedRect.height = 15;
-
-        // extrait la region touchee par l utilisateur
+        touchedRect.width = 8;
+        touchedRect.height = 8;
         Mat touchedRegionRgba = mRgba.submat(touchedRect);
 
+        //find contours sur la region touchee par l'user:
+        Mat touchedRegionRgbaWithContours= Contours(touchedRegionRgba);
+
         Mat touchedRegionHsv = new Mat();
-
-        //Imgproc.blur(frame, touchedRegionRgba, new Size(7, 7));
-
-        Imgproc.cvtColor(touchedRegionRgba, touchedRegionHsv, Imgproc.COLOR_RGB2HSV_FULL);
+        Imgproc.cvtColor(touchedRegionRgbaWithContours, touchedRegionHsv, Imgproc.COLOR_RGB2HSV_FULL);
 
         mBlobColorHsv = Core.sumElems(touchedRegionHsv);
         int pointCount = touchedRect.width * touchedRect.height;
@@ -165,16 +189,19 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
 
         mBlobColorRgba = convertScalarHsv2Rgba(mBlobColorHsv);
 
+        //recupere la couleur de la region touchee par l user:
+        int mycolor = Color.rgb((int) mBlobColorRgba.val[0], (int) mBlobColorRgba.val[1], (int) mBlobColorRgba.val[2]);
+        Log.v(TAG,"couleur: " + mycolor);
         touch_color.setText("Color: #" + String.format("%02X", (int)mBlobColorRgba.val[0])
                 + String.format("%02X", (int)mBlobColorRgba.val[1])
                 + String.format("%02X", (int)mBlobColorRgba.val[2]));
 
-        touch_color.setTextColor(Color.rgb((int) mBlobColorRgba.val[0],
-                (int) mBlobColorRgba.val[1],
-                (int) mBlobColorRgba.val[2]));
-        touch_coordinates.setTextColor(Color.rgb((int)mBlobColorRgba.val[0],
-                (int)mBlobColorRgba.val[1],
-                (int)mBlobColorRgba.val[2]));
+
+        //change la couleur de la region touchee par l'user:
+        touch_color.setTextColor(mycolor);
+
+        //change la couleur du text sur les coordonnees en la couleur de la region touchee:
+        touch_coordinates.setTextColor(mycolor);
 
         return false;
     }
@@ -187,8 +214,4 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         return new Scalar(pointMatRgba.get(0, 0));
     }
 
-    @Override
-    public void onClick(View view) {
-        
-    }
 }

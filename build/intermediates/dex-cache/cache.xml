@@ -2,49 +2,40 @@
 <items version="2" >
 
     <item
-        is-multidex="true"
-        jar="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="26.0.2"
-        sha1="f4ded7f40678ed52f5ffeccf69fba78efbc5b0a7">
-        <dex dex="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_94a6e46c2898042bfeb1c77d29f474151140fef6\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\Herimanitra\.android\build-cache\4a391ee61be2eb1f6b007935b1f733f07b999e3e\output\jars\libs\internal_impl-22.2.0.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="26.0.2"
-        sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
-        <dex dex="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-22.2.0_fcc61ebf9491f6a4742a947105f38cb772a16d8c\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\Herimanitra\.android\build-cache\4fe264f54842d83eab393ba3c7f50d83023c0ea2\output\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="26.0.2"
-        sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
-        <dex dex="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_80e2f36beabfaa159f523b6db5337c930531c48c\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\Herimanitra\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\22.2.0\support-annotations-22.2.0.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="26.0.2"
-        sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
-        <dex dex="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\app\build\intermediates\transforms\dex\debug\folders\1000\10\support-annotations-22.2.0_d0b21dd67743630d6e828e0e8aed1ada277fa89d\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
+        is-multidex="false"
         jar="C:\Users\Herimanitra\.android\build-cache\4a391ee61be2eb1f6b007935b1f733f07b999e3e\output\jars\classes.jar"
-        jumboMode="true"
+        jumboMode="false"
         optimize="true"
         revision="26.0.2"
         sha1="1ee588ff2c4daf7b97c1cbf922a6c7f027285c2f">
-        <dex dex="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_b079658f999b15a684ec4e47fc8b868ddf2e8e10\classes.dex" />
+        <dex dex="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\app\build\intermediates\pre-dexed\debug\classes_b079658f999b15a684ec4e47fc8b868ddf2e8e10.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\libraries\opencv\build\intermediates\bundles\default\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="ed85375da55bfc4fa00855cae161371129eb53f0">
+        <dex dex="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\app\build\intermediates\pre-dexed\debug\classes_910d823dac25b57b660a819801b95fc35b8945ee.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Herimanitra\.android\build-cache\4fe264f54842d83eab393ba3c7f50d83023c0ea2\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
+        <dex dex="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\app\build\intermediates\pre-dexed\debug\classes_80e2f36beabfaa159f523b6db5337c930531c48c.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Herimanitra\.android\build-cache\4a391ee61be2eb1f6b007935b1f733f07b999e3e\output\jars\libs\internal_impl-22.2.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
+        <dex dex="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\app\build\intermediates\pre-dexed\debug\internal_impl-22.2.0_fcc61ebf9491f6a4742a947105f38cb772a16d8c.jar" />
     </item>
     <item
         is-multidex="true"
@@ -54,6 +45,24 @@
         revision="26.0.2"
         sha1="3be78ebc2706b2e1fe2f12d5726887a92d6c183b">
         <dex dex="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_54de827eae131b5d7217126b0b174ba972b2d385\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="26.0.2"
+        sha1="acc236168c6f28374eef41621a7ae75a27c59172">
+        <dex dex="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_94a6e46c2898042bfeb1c77d29f474151140fef6\classes.dex" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Herimanitra\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\22.2.0\support-annotations-22.2.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
+        <dex dex="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\app\build\intermediates\pre-dexed\debug\support-annotations-22.2.0_d0b21dd67743630d6e828e0e8aed1ada277fa89d.jar" />
     </item>
 
 </items>
