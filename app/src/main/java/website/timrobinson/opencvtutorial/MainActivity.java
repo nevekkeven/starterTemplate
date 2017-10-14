@@ -1,8 +1,11 @@
-package website.timrobinson.opencvtutorial;
+//comment avoir le range du bleu: https://gurus.pyimagesearch.com/object-tracking-in-video/
 
+package website.timrobinson.opencvtutorial;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,13 +26,24 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfRect;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.objdetect.CascadeClassifier;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static android.R.id.mask;
+import static org.opencv.imgproc.Imgproc.GaussianBlur;
 
 public class MainActivity extends AppCompatActivity implements OnTouchListener, CvCameraViewListener2 {
     private static final String TAG = "MyActivity";
@@ -37,6 +51,12 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
     private Mat mRgba;
     private Scalar mBlobColorHsv;
     private Scalar mBlobColorRgba;
+
+
+    private CascadeClassifier cascadeClassifier;
+    private Mat grayscaleImage;
+    private int absoluteFaceSize;
+
 
     TextView touch_coordinates;
     TextView touch_color;
@@ -93,6 +113,8 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         mRgba = new Mat();
         mBlobColorRgba = new Scalar(255);
         mBlobColorHsv = new Scalar(255);
+        // The faces will be a 20% of the height of the screen
+        absoluteFaceSize = (int) (height * 0.2);
     }
 
     @Override
@@ -119,32 +141,38 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
 
 
     @Override
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+    //CameraBridgeViewBase.CvCameraViewFrame
+    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame  inputFrame) {
+
+
         mRgba = inputFrame.rgba();
-        return mRgba;
+        Mat resizeimage = new Mat();
+        Size sz = new Size(600,600);
+        Imgproc.resize( mRgba, resizeimage, sz );
+
+        GaussianBlur(mRgba, mRgba,new Size(11, 11), 0);
+        Imgproc.cvtColor(mRgba,mRgba ,Imgproc.COLOR_BGR2HSV);
+        //loop over the color ranges
+        //for (lower, upper, colorName) in colorRanges:
+		//construct a mask for all colors in the current HSV range, then
+		//perform a series of dilations and erosions to remove any small
+		//blobs left in the mask
+        Core.inRange(mRgba, new Scalar(57, 68, 0),new Scalar(151, 255, 255),mRgba );
+        Imgproc.erode(mRgba, mRgba, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2, 2)));
+        Imgproc.dilate(mRgba, mRgba, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2, 2)));
+
+        //finding countours:
+        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+        Imgproc.findContours(mRgba, contours,Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+         if (contours.size()>0){
+             //https://gurus.pyimagesearch.com/object-tracking-in-video/
+
+         }
+
+        return mRgba ;
     }
-    /* algo de detection de contour en utilisant la transformation de Hough */
-    /* prend un parametre une image et retourne une image */
-  public Mat Contours (Mat mymat) {
-      Mat grayMat = new Mat();
-      Mat cannyEdges = new Mat();
-      Mat hierarchy = new Mat();
-      Mat contours = new Mat();
-      Random r =new Random();
-      //a list to store all the contours:
-      List<MatOfPoint> contourList = new ArrayList<MatOfPoint>();
-      //converting the image to grayscale:
-      Imgproc.cvtColor(mymat,grayMat,Imgproc.COLOR_BGR2GRAY);
-      Imgproc.Canny(grayMat,cannyEdges,10,100);
-      //finding contours:
-      Imgproc.findContours(cannyEdges,contourList,hierarchy,Imgproc.RETR_LIST,Imgproc.CHAIN_APPROX_SIMPLE);
-      //drawing contours:
-      contours.create(cannyEdges.rows(),cannyEdges.cols(),CvType.CV_8UC3);
-      for (int i=0; i <contourList.size();i++) {
-          Imgproc.drawContours(contours,contourList,i, new Scalar(r.nextInt(255),r.nextInt(255),r.nextInt(255)),-1 );
-      }
-      return contours;
-  }
+
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         int cols = mRgba.cols();
@@ -176,11 +204,13 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         touchedRect.height = 8;
         Mat touchedRegionRgba = mRgba.submat(touchedRect);
 
-        //find contours sur la region touchee par l'user:
-        Mat touchedRegionRgbaWithContours= Contours(touchedRegionRgba);
+
 
         Mat touchedRegionHsv = new Mat();
-        Imgproc.cvtColor(touchedRegionRgbaWithContours, touchedRegionHsv, Imgproc.COLOR_RGB2HSV_FULL);
+        Imgproc.cvtColor(touchedRegionRgba, touchedRegionHsv, Imgproc.COLOR_RGB2HSV_FULL);
+
+
+
 
         mBlobColorHsv = Core.sumElems(touchedRegionHsv);
         int pointCount = touchedRect.width * touchedRect.height;

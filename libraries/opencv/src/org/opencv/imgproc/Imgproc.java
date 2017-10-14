@@ -2105,7 +2105,7 @@ public class Imgproc {
     }
 
     //javadoc: findContours(image, contours, hierarchy, mode, method)
-    public static void findContours(Mat image, List<MatOfPoint> contours, Mat hierarchy, int mode, int method)
+    public static void findContours(Mat image, List<MatOfPoint> contours, int mode, int method)
     {
         Mat contours_mat = new Mat();
         findContours_1(image.nativeObj, contours_mat.nativeObj, hierarchy.nativeObj, mode, method);
