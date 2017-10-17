@@ -1,14 +1,12 @@
-# OpenCV for Android Color Detection
-### Computer Vision Tutorial
+# OpenCV pour la detection d'objets et la labelisation de couleurs d'interets:
 
-This program implements basic color detection using OpenCV for Android.
-This program accompanies the tutorial linked below, showing detailed instructions on how to complete the following using Android Studio:
+* Translation du programme `python` pour la detection d'objet en temps reel en code java en utilisant le tutoriel
+de https://gurus.pyimagesearch.com/object-tracking-in-video/
 
-* Download and import OpenCV into Android Studio project
-* Emulate Android camera using webcam and virtual device
-* Display camera feed using OpenCV library
-* Process camera feed frames in real time with OpenCV
-* Process color in image on touch event
+* J'ai tout mis dans `onCameraFrame`, c'est un peu long , je ne sais pas si quelqu'un a ume meilleure idee
+
+* L'application marche mais on n'est pas encore rendu au niveau du tutoriel (image noir et blanc dans notre cas)
 
 
-http://timrobinson.space
+L'idee du code est de segmenter l'image de la camera pour detecter des objets (`GaussianBlur`,`erode`,`dilate`), de detecter
+les contours, d'entourer les contours d'un certain niveau  rayon puis de labeliser si ce contour est bleu
