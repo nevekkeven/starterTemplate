@@ -1,15 +1,11 @@
 //comment avoir le range du bleu: https://gurus.pyimagesearch.com/object-tracking-in-video/
 
 package website.timrobinson.opencvtutorial;
-import android.content.Context;
-import android.content.Intent;
+
 import android.graphics.Color;
-import android.net.Uri;
-import android.support.v4.util.Pair;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
@@ -26,24 +22,29 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfRect;
+import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
 import org.opencv.objdetect.CascadeClassifier;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
-import static android.R.id.mask;
+import static org.opencv.core.Core.FONT_HERSHEY_SIMPLEX;
+import static org.opencv.imgproc.Imgproc.COLOR_BGR2HSV;
+import static org.opencv.imgproc.Imgproc.COLOR_HSV2RGB_FULL;
+import static org.opencv.imgproc.Imgproc.COLOR_RGB2HSV_FULL;
 import static org.opencv.imgproc.Imgproc.GaussianBlur;
+import static org.opencv.imgproc.Imgproc.MORPH_RECT;
+import static org.opencv.imgproc.Imgproc.cvtColor;
+import static org.opencv.imgproc.Imgproc.dilate;
+import static org.opencv.imgproc.Imgproc.erode;
+import static org.opencv.imgproc.Imgproc.getStructuringElement;
+import static org.opencv.imgproc.Imgproc.resize;
 
 public class MainActivity extends AppCompatActivity implements OnTouchListener, CvCameraViewListener2 {
     private static final String TAG = "MyActivity";
@@ -146,28 +147,55 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
 
 
         mRgba = inputFrame.rgba();
-        Mat resizeimage = new Mat();
+        Mat frame = new Mat();
         Size sz = new Size(600,600);
-        Imgproc.resize( mRgba, resizeimage, sz );
+        Mat blurred=new Mat();
 
         GaussianBlur(mRgba, mRgba,new Size(11, 11), 0);
         Imgproc.cvtColor(mRgba,mRgba ,Imgproc.COLOR_BGR2HSV);
-        //loop over the color ranges
-        //for (lower, upper, colorName) in colorRanges:
-		//construct a mask for all colors in the current HSV range, then
-		//perform a series of dilations and erosions to remove any small
-		//blobs left in the mask
+
+       // cvtColor(mRgba,mRgba , COLOR_BGR2HSV);
+
+
         Core.inRange(mRgba, new Scalar(57, 68, 0),new Scalar(151, 255, 255),mRgba );
-        Imgproc.erode(mRgba, mRgba, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2, 2)));
-        Imgproc.dilate(mRgba, mRgba, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2, 2)));
+
+
+        erode(mRgba, mRgba, getStructuringElement(MORPH_RECT, new Size(5, 5)));
+        dilate(mRgba, mRgba, getStructuringElement(MORPH_RECT, new Size(5, 5)));
 
         //finding countours:
         List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-        Imgproc.findContours(mRgba, contours,Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-         if (contours.size()>0){
-             //https://gurus.pyimagesearch.com/object-tracking-in-video/
 
-         }
+        Imgproc.findContours(mRgba.clone(),contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        //max contour area:
+        double area =0.;
+        double tmp=0.;
+        int maxindex = -1;
+        float[] radius = new float[1];
+        Point center = new Point();
+        for (int i = 0; i < contours.size(); i++)
+        {
+            tmp = Imgproc.contourArea(contours.get(i));
+           if (tmp>area ) {
+              area = tmp;
+              maxindex=i;
+           }
+
+        }
+        Imgproc.minEnclosingCircle(new MatOfPoint2f(contours.get(maxindex).toArray()),center, radius);
+        if (radius[0]>10) {
+            //
+            Moments M = Imgproc.moments(contours.get(maxindex), true);
+            double cX = M.get_m10() /M.get_m00();
+            double cY = M.get_m01() / M.get_m00();
+
+            Imgproc.circle( mRgba, center, 4, new Scalar(0,255,255), 2);
+            String colorName="bleu";
+            Imgproc.putText(mRgba, colorName, new Point(cX, cY), FONT_HERSHEY_SIMPLEX, 1.0, new Scalar(0, 255, 255), 2);
+
+        }
+
 
         return mRgba ;
     }
@@ -207,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
 
 
         Mat touchedRegionHsv = new Mat();
-        Imgproc.cvtColor(touchedRegionRgba, touchedRegionHsv, Imgproc.COLOR_RGB2HSV_FULL);
+        cvtColor(touchedRegionRgba, touchedRegionHsv, COLOR_RGB2HSV_FULL);
 
 
 
@@ -239,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
     private Scalar convertScalarHsv2Rgba(Scalar hsvColor) {
         Mat pointMatRgba = new Mat();
         Mat pointMatHsv = new Mat(1, 1, CvType.CV_8UC3, hsvColor);
-        Imgproc.cvtColor(pointMatHsv, pointMatRgba, Imgproc.COLOR_HSV2RGB_FULL, 4);
+        cvtColor(pointMatHsv, pointMatRgba, COLOR_HSV2RGB_FULL, 4);
 
         return new Scalar(pointMatRgba.get(0, 0));
     }

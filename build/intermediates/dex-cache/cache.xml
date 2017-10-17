@@ -16,8 +16,8 @@
         jumboMode="false"
         optimize="true"
         revision="26.0.2"
-        sha1="ed85375da55bfc4fa00855cae161371129eb53f0">
-        <dex dex="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\app\build\intermediates\pre-dexed\debug\classes_910d823dac25b57b660a819801b95fc35b8945ee.jar" />
+        sha1="9da6022cfb7e20fb67751a346280537d998e339d">
+        <dex dex="C:\Users\Herimanitra\OpenCv-for-Android-Color-Detection\app\build\intermediates\pre-dexed\release\classes_910d823dac25b57b660a819801b95fc35b8945ee.jar" />
     </item>
     <item
         is-multidex="false"

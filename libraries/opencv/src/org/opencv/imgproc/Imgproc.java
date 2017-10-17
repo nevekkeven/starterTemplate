@@ -4,9 +4,6 @@
 //
 package org.opencv.imgproc;
 
-import java.lang.String;
-import java.util.ArrayList;
-import java.util.List;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
@@ -20,6 +17,9 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.core.TermCriteria;
 import org.opencv.utils.Converters;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Imgproc {
 
@@ -2105,7 +2105,7 @@ public class Imgproc {
     }
 
     //javadoc: findContours(image, contours, hierarchy, mode, method)
-    public static void findContours(Mat image, List<MatOfPoint> contours, int mode, int method)
+    public static void findContours(Mat image, List<MatOfPoint> contours, Mat hierarchy, int mode, int method)
     {
         Mat contours_mat = new Mat();
         findContours_1(image.nativeObj, contours_mat.nativeObj, hierarchy.nativeObj, mode, method);
